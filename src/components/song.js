@@ -1,5 +1,6 @@
 import FavoriteIcon from "@material-ui/icons/Favorite";
 import FavoriteOutlineIcon from "@material-ui/icons/FavoriteBorder";
+import ArrowBackIcon from "@material-ui/icons/ArrowBackIos";
 
 /** @jsx jsx */
 import { jsx } from "@emotion/core";
@@ -17,7 +18,8 @@ const Song = ({
   addToExistingPlaylist,
   newPlaylistName,
   handleInputChange,
-  playlists
+  playlists,
+  unselectSong
 }) => {
   const {
     artistName,
@@ -40,138 +42,305 @@ const Song = ({
   //when user clicks on the playlist, song is added
   return (
     <Container>
-      <a href={trackViewUrl}>
-        <img src={artworkUrl100} alt="artwork" width="200" />
-      </a>
-      <button onClick={() => toggleFavourite(song)}>
-        {isFavourite ? <FavoriteIcon /> : <FavoriteOutlineIcon />}
-      </button>
+      <BackButton onClick={unselectSong}>
+        <ArrowBackIcon style={{ fontSize: 13, marginRight: 5 }} />
+        back
+      </BackButton>
+      <Content>
+        <TopSection>
+          <ImgContainer>
+            <a href={trackViewUrl}>
+              <img src={artworkUrl100} alt="artwork" width="200" />
+            </a>
+          </ImgContainer>
+          <BtnContainer>
+            <FavoriteButton onClick={() => toggleFavourite(song)}>
+              {isFavourite ? (
+                <FavoriteIcon style={{ color: "red" }} />
+              ) : (
+                <FavoriteOutlineIcon style={{ color: "red" }} />
+              )}
+            </FavoriteButton>
+          </BtnContainer>
 
-      <button
-        onClick={handleShowPlaylistsToAddSong}
-        style={{ cursor: "pointer" }}
-      >
-        {showPlaylistsToAddSong ? "cancel" : "add to playlist"}
-      </button>
-      {showPlaylistsToAddSong ? (
-        <div>
-          <button onClick={handleCreateNewPlaylist}>create a playlist</button>
-          {showNewPlaylistForm ? (
-            <form onSubmit={e => createNewPlaylist(e, song)}>
-              <input
-                type="text"
-                placeholder="name of new playlist"
-                onChange={handleInputChange}
-                value={newPlaylistName}
-                name="newPlaylistName"
-                autoFocus
-              />
-              <button type="submit" style={{ cursor: "pointer" }}>
-                Create
-              </button>
-              <button onClick={handleCreateNewPlaylist}>cancel</button>
-            </form>
-          ) : null}
-          {playlists &&
-            playlists.map(playlist => (
-              <div
-                key={playlist.id}
-                onClick={() => addToExistingPlaylist(song, playlist)}
-                style={{ cursor: "pointer" }}
-              >
-                {playlist.name}
-              </div>
-            ))}
-        </div>
-      ) : null}
+          <BtnContainer>
+            <AddButton onClick={handleShowPlaylistsToAddSong}>
+              {showPlaylistsToAddSong ? "cancel" : "add to playlist"}
+            </AddButton>
+          </BtnContainer>
+        </TopSection>
 
-      <h1>{trackName}</h1>
-      <h4>
-        Artist:{" "}
-        <a href={artistViewUrl} target="_blank" rel="noopener noreferrer">
-          {artistName}
-        </a>
-      </h4>
+        {showPlaylistsToAddSong ? (
+          <AddToPlaylistContainer>
+            <CreatePlaylistButton onClick={handleCreateNewPlaylist}>
+              Create new playlist
+            </CreatePlaylistButton>
+            {showNewPlaylistForm ? (
+              <NewPlaylistForm onSubmit={e => createNewPlaylist(e, song)}>
+                <input
+                  type="text"
+                  placeholder="New playlist name"
+                  onChange={handleInputChange}
+                  value={newPlaylistName}
+                  name="newPlaylistName"
+                  autoFocus
+                />
+                <CreateButton type="submit">Create</CreateButton>
+                <CancelButton onClick={handleCreateNewPlaylist}>
+                  cancel
+                </CancelButton>
+              </NewPlaylistForm>
+            ) : null}
+            {playlists &&
+              playlists.map(playlist => (
+                <Playlist
+                  key={playlist.id}
+                  onClick={() => addToExistingPlaylist(song, playlist)}
+                >
+                  {playlist.name}
+                </Playlist>
+              ))}
+          </AddToPlaylistContainer>
+        ) : null}
 
-      <h4>
-        Collection:{" "}
-        <a href={collectionViewUrl} target="_blank" rel="noopener noreferrer">
-          {collectionName}
-        </a>
-      </h4>
-      <h4>
-        {primaryGenreName} • {dte} • {country}
-      </h4>
+        <SongInfoContainer>
+          <h1>{trackName}</h1>
+          <h4>
+            Artist:{" "}
+            <a href={artistViewUrl} target="_blank" rel="noopener noreferrer">
+              {artistName}
+            </a>
+          </h4>
 
-      {previewUrl.charAt(previewUrl.length - 1) === "v" ? (
-        <video
-          controls
-          autoPlay
-          name="media"
-          width="100%"
-          style={{ border: "1px solid pink" }}
-        >
-          <source src={previewUrl} type="audio/x-m4a" />
-        </video>
-      ) : (
-        <audio
-          controls
-          autoPlay
-          name="media"
-          width="330"
-          height="70"
-          style={{ border: "1px solid pink" }}
-        >
-          <source src={previewUrl} type="audio/x-m4a" />
-        </audio>
-      )}
+          <h4>
+            Collection:{" "}
+            <a
+              href={collectionViewUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              {collectionName}
+            </a>
+          </h4>
+          <h4>
+            {primaryGenreName} • {dte} • {country}
+          </h4>
+
+          {previewUrl.charAt(previewUrl.length - 1) === "v" ? (
+            <video controls autoPlay name="media" width="100%">
+              <source src={previewUrl} type="audio/x-m4a" />
+            </video>
+          ) : (
+            <audio controls autoPlay name="media" width="330" height="70">
+              <source src={previewUrl} type="audio/x-m4a" />
+            </audio>
+          )}
+        </SongInfoContainer>
+      </Content>
     </Container>
   );
 };
-// video:
-// https://video-ssl.itunes.apple.com/itunes-assets/Video125/v4/37/06/b0/3706b09f-21d6-38b5-3be8-a918c4e557c7/mzvf_5612497697990929684.640x480.h264lc.U.p.m4v
-
-// audio:
-// https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview128/v4/7e/fc/23/7efc234d-c6e8-d756-b9d6-5c9dad73e4e8/mzaf_79272927364963797.plus.aac.p.m4a
 
 export default Song;
 
-const Container = styled.div`
-  border: 1px solid pink;
+const mont = "Montserrat, serif";
+const light = 400;
+const small = "13px";
+const purple = "#670E99";
+const newLilac = "#efe3f5";
+
+const Container = styled.div``;
+
+const Content = styled.div`
+  border: 1px solid ${props => props.theme.style1Color};
+  border-radius: 5px;
+  padding: 20px;
+  padding-bottom: 40px;
+  background: ${newLilac};
+  h1 {
+    color: #000;
+  }
+  a {
+    color: ${purple};
+    text-decoration: none;
+    &:hover {
+      color: ${purple};
+      text-decoration: underline;
+    }
+  }
 `;
 
-// {
-//   wrapperType: "track"
-//   kind: "song"
-//   artistId: 27044968
-//   collectionId: 1206122676
-//   trackId: 1206122805
-//   artistName: "Pitbull"
-//   collectionName: "Climate Change"
-//   trackName: "Options (feat. Stephen Marley)"
-//   collectionCensoredName: "Climate Change"
-//   trackCensoredName: "Options (feat. Stephen Marley)"
-//   artistViewUrl: "https://music.apple.com/us/artist/pitbull/27044968?uo=4
-//***same
-//   collectionViewUrl: "https://music.apple.com/us/album/options-feat-stephen-marley/1206122676?i=1206122805&uo=4"
-//   trackViewUrl:      "https://music.apple.com/us/album/options-feat-stephen-marley/1206122676?i=1206122805&uo=4"
-//***
-//   previewUrl: "https://audio-ssl.itunes.apple.com/itunes-assets/AudioPreview122/v4/af/52/69/af5269e0-13df-1ffe-ecef-1a7d5ba728c8/mzaf_8873910042996635548.plus.aac.p.m4a"
-//   artworkUrl30: "https://is1-ssl.mzstatic.com/image/thumb/Music111/v4/bf/6a/84/bf6a842d-3610-5636-9a6e-908ea033a27c/source/30x30bb.jpg"
-//   artworkUrl60: "https://is1-ssl.mzstatic.com/image/thumb/Music111/v4/bf/6a/84/bf6a842d-3610-5636-9a6e-908ea033a27c/source/60x60bb.jpg"
-//   artworkUrl100: "https://is1-ssl.mzstatic.com/image/thumb/Music111/v4/bf/6a/84/bf6a842d-3610-5636-9a6e-908ea033a27c/source/100x100bb.jpg"
-//   collectionPrice: 9.99
-//   trackPrice: 1.29
-//   releaseDate: "2017-03-21T07:00:00Z"
-//   collectionExplicitness: "cleaned"
-//   trackExplicitness: "cleaned"
-//   discCount: 1
-//   discNumber: 1
-//   trackCount: 11
-//   trackNumber: 8
-//   trackTimeMillis: 239765
-//   country: "USA"
-//   currency: "USD"
-//   primaryGenreName: "Pop"
-//   contentAdvisoryRating: "Clean"
-//   isStreamable: true}
+const BackButton = styled.button`
+  padding: 5px 20px;
+  background: transparent;
+  border: 1px solid ${props => props.theme.textColor};
+  border-radius: 5px;
+  outline: none;
+  font-family: ${mont};
+  color: ${props => props.theme.textColor};
+  font-size: ${small};
+  font-weight: ${light};
+  cursor: pointer;
+  margin-bottom: 10px;
+  &:focus {
+    outline: none !important;
+  }
+  &:hover {
+    font-weight: 600;
+  }
+`;
+
+const TopSection = styled.div`
+  display: grid;
+  grid-template-columns: 220px 55px 150px;
+  grid-gap: 10px;
+  width: 100%;
+`;
+
+const ImgContainer = styled.div`
+  border: 1px solid #000;
+  border-radius: 5px;
+  padding: 10px;
+  padding-rigth: 15px;
+  border: 1px solid #c2bdc5;
+  background: #fff;
+`;
+
+const BtnContainer = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  width: 100%;
+`;
+
+const FavoriteButton = styled.button`
+  border: 1px solid #000;
+  background: #fff;
+  border-radius: 5px;
+  cursor: pointer;
+  padding: 3px 10px;
+  margin: 0 5px;
+  margin-bottom: 10px;
+  &:focus {
+    outline: none !important;
+  }
+  &:hover {
+    font-weight: 600;
+    font-size: 15px;
+  }
+`;
+
+const AddButton = styled.button`
+  background: #fff;
+  color: #000;
+  border: 1px solid #000;
+  border-radius: 5px;
+  padding: 8px 20px;
+  font-size: ${small};
+  font-weight: ${light};
+  cursor: pointer;
+  margin-bottom: 10px;
+  font-family: ${mont};
+  &:focus {
+    outline: none !important;
+  }
+  &:hover {
+    font-weight: 600;
+  }
+`;
+
+const AddToPlaylistContainer = styled.div`
+  padding: 20px 0;
+`;
+
+const CreatePlaylistButton = styled.button`
+  background: #fff;
+  color: #000;
+  border: 1px solid #000;
+  border-radius: 5px;
+  padding: 8px 20px;
+  font-size: ${small};
+  font-weight: ${light};
+  cursor: pointer;
+  margin-bottom: 20px;
+  font-family: ${mont};
+  &:focus {
+    outline: none !important;
+  }
+  &:hover {
+    font-weight: 600;
+  }
+`;
+
+const Playlist = styled.div`
+  padding: 5px 10px;
+  color: #000;
+  border-bottom: 1px solid ${purple} !important;
+  width: 55%;
+  cursor: pointer;
+  &:hover {
+    font-weight: 600;
+  }
+`;
+
+const CreateButton = styled.button`
+  background: ${purple};
+  color: #fff;
+  border: 0;
+  border-radius: 5px;
+  padding: 5px 25px;
+  font-size: ${small};
+  cursor: pointer;
+  margin-bottom: 20px;
+  font-family: ${mont};
+  margin-right: 20px;
+  &:focus {
+    outline: none !important;
+  }
+  &:hover {
+    font-weight: 600;
+  }
+`;
+
+const CancelButton = styled.button`
+  background: #fff;
+  color: #000;
+  border: 1px solid #000;
+  border-radius: 5px;
+  padding: 5px 25px;
+  font-size: ${small};
+  cursor: pointer;
+  margin-bottom: 20px;
+  font-family: ${mont};
+  &:focus {
+    outline: none !important;
+  }
+  &:hover {
+    font-weight: 600;
+  }
+`;
+const NewPlaylistForm = styled.form`
+  margin-bottom: 0;
+  input {
+    font-family: ${mont};
+    color: #000;
+    font-size: ${small};
+    background: transparent;
+    border: 0 !important;
+    border-bottom: 1px solid ${props => props.theme.style1Color} !important;
+    width: 230px;
+    padding: 10px;
+    padding-bottom: 6px;
+    margin-right: 6px;
+    &:focus {
+      outline: none !important;
+    }
+    ::placeholder {
+      color: grey;
+    }
+  }
+`;
+
+const SongInfoContainer = styled.div`
+  padding: 10px;
+`;

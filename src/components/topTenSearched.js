@@ -1,4 +1,9 @@
+// eslint-disable-next-line
 import React from "react";
+
+/** @jsx jsx */
+import { jsx } from "@emotion/core";
+import styled from "@emotion/styled";
 
 const sortByFrequencyAndRemoveDuplicates = array => {
   let frequency = {},
@@ -42,21 +47,60 @@ const TopTenSearched = ({
   const topSearchesArray = sortByFrequencyAndRemoveDuplicates(searchQueryArray);
   return (
     <>
-      {searchQueryArray.length >= 10 ? (
+      {searchQueryArray.length >= 1 && (
         <div>
-          <button onClick={handleTopTenSearched} style={{ cursor: "pointer" }}>
-            {showTopTenSearched
-              ? "Close Top 10 searched"
-              : "Show Top 10 searched"}
-          </button>
-          {showTopTenSearched
-            ? searchQueryArray &&
-              topSearchesArray.map(item => <div key={item}>{item}</div>)
-            : null}
+          <SecondaryButton onClick={handleTopTenSearched}>
+            Top 10 searches
+          </SecondaryButton>
+          {showTopTenSearched && (
+            <ResultsContainer>
+              {searchQueryArray &&
+                topSearchesArray.map(item => <Item key={item}>{item}</Item>)}
+            </ResultsContainer>
+          )}
         </div>
-      ) : null}
+      )}
     </>
   );
 };
 
 export default TopTenSearched;
+
+const mont = "Montserrat, serif";
+const light = 400;
+const small = "13px";
+const lilac = "#E5C3EE";
+
+const SecondaryButton = styled.button`
+  background: ${props => props.theme.secondaryButtonBgColor};
+  color: ${props => props.theme.secondaryButtonTextColor};
+  border: 1px solid ${props => props.theme.secondaryButtonBorder};
+  border-radius: 5px;
+  padding: 7px 20px;
+  font-size: ${small};
+  font-weight: ${light};
+  cursor: pointer;
+  margin-bottom: 10px;
+  font-family: ${mont};
+  &:focus {
+    outline: none !important;
+  }
+  &:hover {
+    background: ${props => props.theme.secondaryButtonBgColorHover};
+    color: ${props => props.theme.secondaryButtonTextColorHover};
+    border: 1px solid ${props => props.theme.secondaryButtonBorderHover};
+  }
+`;
+
+const Item = styled.div`
+  color: ${props => props.theme.textColor};
+  padding: 10px;
+  font-size: ${small};
+`;
+
+const ResultsContainer = styled.div`
+  width: 100%;
+  margin-bottom: 10px;
+  border: 1px solid ${lilac};
+  border-radius: 5px;
+`;

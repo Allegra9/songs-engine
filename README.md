@@ -2,7 +2,7 @@
 
 This is a songs search engine built with [iTunes API](https://affiliate.itunes.apple.com/resources/documentation/itunes-store-web-service-search-api/#searching)
 
-Search for songs, listen to preview audio or video, favourite songs and add them to your playlists!
+Search for songs, listen to previews (audio or video), favourite songs and make your own playlists!
 
 ## How to run:
 

@@ -56,14 +56,16 @@ class Songs extends React.Component {
   handleSubmit = async e => {
     e.preventDefault();
     const { searchQuery, searchQueryArray } = this.state;
-    const data = await getSongs(searchQuery);
-    let songs = data.results;
-    songs.length = 25;
-    this.setState({
-      songs,
-      searchQueryArray: [...searchQueryArray, searchQuery],
-      searchQuery: ""
-    });
+    if (searchQuery) {
+      const data = await getSongs(searchQuery);
+      let songs = data.results;
+      songs.length = 25;
+      this.setState({
+        songs,
+        searchQueryArray: [...searchQueryArray, searchQuery],
+        searchQuery: ""
+      });
+    }
   };
 
   handleTopTenSearched = () => {
@@ -214,23 +216,21 @@ class Songs extends React.Component {
           <Switch handleThemeChange={handleThemeChange} isDark={isDark} />
 
           {selectedSong ? (
-            <>
-              <button onClick={this.unselectSong}>back</button>
-              <Song
-                song={selectedSong}
-                toggleFavourite={this.toggleFavourite}
-                isFavourite={this.checkIfFavourite(selectedSong)}
-                handleShowPlaylistsToAddSong={this.handleShowPlaylistsToAddSong}
-                showPlaylistsToAddSong={showPlaylistsToAddSong}
-                handleCreateNewPlaylist={this.handleCreateNewPlaylist}
-                showNewPlaylistForm={showNewPlaylistForm}
-                createNewPlaylist={this.createNewPlaylist}
-                newPlaylistName={newPlaylistName}
-                handleInputChange={this.handleInputChange}
-                addToExistingPlaylist={this.addToExistingPlaylist}
-                playlists={playlists}
-              />
-            </>
+            <Song
+              song={selectedSong}
+              toggleFavourite={this.toggleFavourite}
+              isFavourite={this.checkIfFavourite(selectedSong)}
+              handleShowPlaylistsToAddSong={this.handleShowPlaylistsToAddSong}
+              showPlaylistsToAddSong={showPlaylistsToAddSong}
+              handleCreateNewPlaylist={this.handleCreateNewPlaylist}
+              showNewPlaylistForm={showNewPlaylistForm}
+              createNewPlaylist={this.createNewPlaylist}
+              newPlaylistName={newPlaylistName}
+              handleInputChange={this.handleInputChange}
+              addToExistingPlaylist={this.addToExistingPlaylist}
+              playlists={playlists}
+              unselectSong={this.unselectSong}
+            />
           ) : selectedPlaylist.name ? (
             <SelectedPlaylist
               handleShowSelectedPlaylist={this.handleShowSelectedPlaylist}
@@ -242,26 +242,31 @@ class Songs extends React.Component {
                 handleSubmit={this.handleSubmit}
                 handleInputChange={this.handleInputChange}
                 searchQuery={searchQuery}
+                isDark={isDark}
               />
-              <TopTenSearched
-                searchQueryArray={searchQueryArray}
-                handleTopTenSearched={this.handleTopTenSearched}
-                showTopTenSearched={showTopTenSearched}
-              />
-              <Favourites
-                favourites={favourites}
-                showFavourites={showFavourites}
-                handleShowFavourites={this.handleShowFavourites}
-                handleSelectSong={this.handleSelectSong}
-              />
-              <Playlists
-                playlists={playlists}
-                handleShowSelectedPlaylist={this.handleShowSelectedPlaylist}
-              />
-              <SongsList
-                songs={songs}
-                handleSelectSong={this.handleSelectSong}
-              />
+              <AdditionalButtons>
+                <Favourites
+                  favourites={favourites}
+                  showFavourites={showFavourites}
+                  handleShowFavourites={this.handleShowFavourites}
+                  handleSelectSong={this.handleSelectSong}
+                />
+                <TopTenSearched
+                  searchQueryArray={searchQueryArray}
+                  handleTopTenSearched={this.handleTopTenSearched}
+                  showTopTenSearched={showTopTenSearched}
+                />
+              </AdditionalButtons>
+              <MainContent>
+                <SongsList
+                  songs={songs}
+                  handleSelectSong={this.handleSelectSong}
+                />
+                <Playlists
+                  playlists={playlists}
+                  handleShowSelectedPlaylist={this.handleShowSelectedPlaylist}
+                />
+              </MainContent>
             </>
           )}
         </Content>
@@ -272,24 +277,19 @@ class Songs extends React.Component {
 
 export default Songs;
 
-// const pink = "#d23669";
-const purple = "#181bed";
-const cream = "#fffcf2";
-const lightGrey = "#c2c0c0";
-// const dark = "#222";
 const mont = "Montserrat, serif";
-// const meri = "Merriweather, serif";
 const thin = 400;
-const demi = 600;
 const thick = 900;
 
 const Container = styled.div`
   background: ${props => props.theme.backgroundColor};
-  border: 1px solid ${cream};
+  font-family: ${mont};
+  padding-bottom: 100px;
+  height: 1500px;
 `;
 
 const Content = styled.div`
-  width: 45%;
+  width: 50%;
   margin: auto;
   text-align: left;
   text-rendering: optimizeLegibility;
@@ -305,34 +305,14 @@ const Content = styled.div`
   }
   p {
     color: ${props => props.theme.textColor};
-    font-family: ${mont};
     font-size: 15px;
     font-weight: ${thin};
     letter-spacing: 1px;
     margin-top: 0;
     margin-bottom: 30px;
   }
-  form {
-    margin-bottom: 20px;
-    input {
-      border: 0;
-      border-bottom: 2px solid ${purple};
-      font-family: ${mont};
-      color: ${lightGrey};
-      font-size: 17px;
-      font-weight: ${demi};
-      padding: 3px;
-      background: transparent;
-      &:focus {
-        outline: none !important;
-      }
-      ::placeholder {
-        color: ${lightGrey};
-      }
-    }
-  }
   @media screen and (max-width: 1024px) {
-    width: 60%;
+    width: 80%;
   }
   @media screen and (max-width: 768px) {
     width: 80%;
@@ -350,34 +330,12 @@ const Content = styled.div`
   }
 `;
 
-// const pinkFont = css`
-//   color: ${pink};
-//   font-size: 25px;
-//   font-weight: ${thick};
-//   cursor: pointer;
-//   font-family: ${mont};
-// `;
+const AdditionalButtons = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+`;
 
-// const CurrentPost = styled.div`
-//   display: grid;
-//   grid-template-columns: 1fr 30px;
-//   div {
-//     display: flex;
-//     justify-content: center;
-//   }
-//   h3 {
-//     margin-top: auto;
-//     margin-bottom: 20px;
-//   }
-// `;
-
-// const IconContainer = styled.div`
-//   padding: 2px;
-//   cursor: pointer;
-//   svg {
-//     color: ${lightGrey};
-//     &:hover {
-//       color: ${purple};
-//     }
-//   }
-// `;
+const MainContent = styled.div`
+  display: flex;
+  justify-content: space-between;
+`;
